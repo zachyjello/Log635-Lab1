@@ -7,13 +7,14 @@ from PIL import Image
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3
 
+#Global variables
 alreadyDoneImages = []
 liveCamera = False
 fullPath = "photos"
 index = 0
 
+# Create the directory to place the pictures
 def createAllDirectories():
-    # Indiquer le dossier pour stocker les photos
     if not os.path.exists('photos'):
         os.makedirs('photos')
     if not os.path.exists('photos/Triangles'):
@@ -57,6 +58,8 @@ def createAllDirectories():
     if not os.path.exists('photos/Circles/Circle5'):
         os.makedirs('photos/Circles/Circle5')
 
+#Take a picture and save it in the good directory
+#Take care of looking in the directory to adjust the file name
 def on_new_camera_image(evt, **kwargs):    
     global liveCamera
     global fullPath
@@ -64,21 +67,20 @@ def on_new_camera_image(evt, **kwargs):
         print("Cozmo is taking a photo")
         pilImage = kwargs['image'].raw_image
         existing_photos = [f for f in os.listdir(fullPath) if f.startswith("photo_") and f.endswith(".jpg")]
-        photo_count = len(existing_photos)  # Count of existing photos
-
-        # Increment the count for the new photo
+        photo_count = len(existing_photos)
         new_photo_index = photo_count + 1
-        filename = f"photo_{new_photo_index:02d}.jpg"  # Format with leading zero
+        filename = f"photo_{new_photo_index:02d}.jpg"
         fullPathModified = os.path.join(fullPath, filename)
 
         pilImage.save(fullPathModified, "JPEG")
         liveCamera = False
 
+#Start the photo action(live camera)
 def TakePhoto(robot: cozmo.robot.Robot, path):
     global liveCamera
     global fullPath
     fullPath=path
-    # Assurez-vous que la tête et le bras de Cozmo sont à un niveau raisonnable
+    # Head and arms of cozmo set
     robot.set_head_angle(degrees(5.0)).wait_for_completed()
     robot.set_lift_height(0.0).wait_for_completed()
 
@@ -97,38 +99,46 @@ def action_for_marker_1(robot: cozmo.robot.Robot):
     print("I do action 1")
     robot.play_anim_trigger(cozmo.anim.Triggers.Surprise).wait_for_completed()
 
-#STACK CUBES
+#TALK
 def action_for_marker_2(robot: cozmo.robot.Robot):
     print("I do action 2")
     robot.say_text("Pokemon, gotta catch em' all!").wait_for_completed()
 
+#RECONIZE FACE
 def action_for_marker_3(robot: cozmo.robot.Robot):
     print("I do action 3")
     light_when_face(robot)
 
+#MOVE
 def action_for_marker_4(robot: cozmo.robot.Robot):
     print("I do action 4")
     cozmo_move_around(robot)
 
+#TALK
 def action_for_marker_5(robot: cozmo.robot.Robot):
     print("I do action 5")
     robot.say_text("I will be the very best").wait_for_completed()
 
+#EMOTION
 def action_for_marker_6(robot: cozmo.robot.Robot):
     print("I do action 6")
     robot.play_anim_trigger(robot.anim_triggers[3]).wait_for_completed()
 
+#TALK
 def action_for_marker_7(robot: cozmo.robot.Robot):
     print("I do action 7")
     robot.say_text("Pikachu I choose you").wait_for_completed()
 
+#TALK
 def action_for_marker_8(robot: cozmo.robot.Robot):
     print("I do action 8")
     robot.say_text("Pikachu I'm glad I chose you").wait_for_completed()
 
+#IMAGE ON FACE
 def action_for_marker_9(robot: cozmo.robot.Robot):
     show_pokemon_pic(robot)
 
+#MOVE
 def action_for_marker_10(robot: cozmo.robot.Robot):
     print("I do action 10")
     robot.drive_straight(distance_mm(-75), speed_mmps(100)).wait_for_completed()
@@ -136,10 +146,12 @@ def action_for_marker_10(robot: cozmo.robot.Robot):
     robot.drive_straight(distance_mm(-75), speed_mmps(100)).wait_for_completed()
     nothing = True
 
+#TALK
 def action_for_marker_11(robot: cozmo.robot.Robot):
     print("I do action 11")
     robot.say_text("A legendary bird, launch the master ball").wait_for_completed()
 
+#MOVE
 def action_for_marker_12(robot: cozmo.robot.Robot):
     print("I do action 12")
     #This is mine Zach touch it and you died: no <3 Je t'aime Zach
@@ -148,30 +160,33 @@ def action_for_marker_12(robot: cozmo.robot.Robot):
     robot.turn_in_place(degrees(180)).wait_for_completed()
     robot.turn_in_place(degrees(180)).wait_for_completed()
 
-
+#EMOTION
 def action_for_marker_13(robot: cozmo.robot.Robot):
     print("I do action 13")
     robot.play_anim_trigger(robot.anim_triggers[5]).wait_for_completed()
 
+#CUBES
 def action_for_marker_14(robot: cozmo.robot.Robot):
     global index
     print("I do action 14")
     index += 1
     cozmo_cube_action(robot, index)
 
+#CUBES
 def action_for_marker_15(robot: cozmo.robot.Robot):
     global index
     print("I do action 15")
     index += 1
     cozmo_cube_action(robot, index)
 
+#Main function to declare custom object and marker's logics
 def cozmo_program(robot: cozmo.robot.Robot):
     createAllDirectories()
     
-    # Chaque fois que Cozmo voit une "nouvelle" image, prends une photo
+    # Each time Cozmo see a new image it take a picture
     robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)
 
-    #Création des objets customs
+    #Create custom objects
     robot.world.define_custom_wall(CustomObjectTypes.CustomType00,
                                    CustomObjectMarkers.Triangles2,
                                    50, 58, 26, 26, True)
@@ -229,19 +244,19 @@ def cozmo_program(robot: cozmo.robot.Robot):
     time.sleep(2)
     print(robot.pose)
     while len(alreadyDoneImages) < 16:
-        # Chercher les objets
+        # Lookaround to find the objects declared 
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
         lookaround.stop()
         for obj in object_found:
-            # Vérifiez si l'objet est un marqueur que vous surveillez
             try:
                 reconized_thing = obj.object_type
                 position = obj.pose
             except:
-                reconized_thing = None
+                reconized_thing = None #There if it sees lightcubes or charger
             if reconized_thing not in alreadyDoneImages:
-                if reconized_thing == CustomObjectTypes.CustomType00:
+                #Gestion of all actions (could be refactor one day)
+                if reconized_thing == CustomObjectTypes.CustomType00: 
                     print("Recognize custom type 00")
                     initial_pose = robot.pose
                     robot.go_to_pose(position*0.9).wait_for_completed()
@@ -407,11 +422,12 @@ def cozmo_program(robot: cozmo.robot.Robot):
                     alreadyDoneImages.append(CustomObjectTypes.CustomType15)
                     break
 
+    #End of program, means all 16 actions have been done
     print("I'm done here, it's getting dark in here, goodbye")
     while True:
         time.sleep(0.1)
 
-    
+#Linked with Face detection action, look and wait for a head before saying something
 def light_when_face(robot: cozmo.robot.Robot):
     '''The core of the light_when_face program'''
 
@@ -441,6 +457,7 @@ def light_when_face(robot: cozmo.robot.Robot):
 
         time.sleep(.1)
 
+#Linked to mouvment function, move around
 def cozmo_move_around (robot: cozmo.robot.Robot):
     # Drive forwards for 150 millimeters at 50 millimeters-per-second.
     robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
@@ -455,12 +472,11 @@ def cozmo_move_around (robot: cozmo.robot.Robot):
 
     robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
 
+#Linked with image action, display pokemon on face
 def show_pokemon_pic (robot: cozmo.robot.Robot):
     current_directory = os.path.dirname(os.path.realpath(__file__))
-    #Formule ETS is cool
     # resize to fit on Cozmo's face screen
     imagePokemon = os.path.join(current_directory, "Pokemon.png")
-    #imagePokemon = os.path.join(current_directory, "cozmosdk.png")
     resized_image = Image.open(imagePokemon).resize(cozmo.oled_face.dimensions(), Image.BICUBIC)
 
     # convert the image to the format used by the oled screen
@@ -468,6 +484,7 @@ def show_pokemon_pic (robot: cozmo.robot.Robot):
                                                                 invert_image=True)
     robot.display_oled_face_image(face_image, 10000).wait_for_completed()
 
+#NOT WORKING FUNCTION, should have played pokemon theme song, but couldn't make it fast enough
 def cozmo_jam_out (robot: cozmo.robot.Robot):
     notes = [
         cozmo.song.SongNote(cozmo.song.NoteTypes.A2, cozmo.song.NoteDurations.Half),
@@ -486,7 +503,8 @@ def cozmo_jam_out (robot: cozmo.robot.Robot):
         cozmo.song.SongNote(cozmo.song.NoteTypes.G2, cozmo.song.NoteDurations.Half)
         ]
     robot.play_song(notes, loop_count=1).wait_for_completed()
-    
+
+#Linked with cubes function, should Stack and KnockOver cubes
 def cozmo_cube_action(robot: cozmo.robot.Robot, index: int):
     time.sleep(5)
     if(index == 1):
@@ -497,70 +515,6 @@ def cozmo_cube_action(robot: cozmo.robot.Robot, index: int):
         robot.world.get_light_cube(cozmo.objects.LightCube1Id).set_lights(cozmo.lights.red_light.flash())
         robot.world.get_light_cube(cozmo.objects.LightCube2Id).set_lights(cozmo.lights.red_light.flash())
         robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.KnockOverCubes, active_time=60)
-    
-def cozmo_pickup_nearby_cube(robot: cozmo.robot.Robot):
-    look_around = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
 
-    # try to find a block
-    cube = None
-
-    try:
-        cube = robot.world.wait_for_observed_light_cube(timeout=30)
-        print("Found cube", cube)
-
-    except asyncio.TimeoutError:
-        print("Didn't find a cube :-(")
-
-    finally:
-        # whether we find it or not, we want to stop the behavior
-        look_around.stop()
-
-    if cube is None:
-        robot.play_anim_trigger(cozmo.anim.Triggers.MajorFail)
-        return
-
-    print("Yay, found cube")
-
-    cube.set_lights(cozmo.lights.green_light.flash())
-
-    anim = robot.play_anim_trigger(cozmo.anim.Triggers.BlockReact)
-    anim.wait_for_completed()
-
-
-    action = robot.pickup_object(cube)
-    print("got action", action)
-    result = action.wait_for_completed(timeout=30)
-    print("got action result", result)
-
-    robot.turn_in_place(degrees(90)).wait_for_completed()
-
-    action = robot.place_object_on_ground_here(cube)
-    print("got action", action)
-    result = action.wait_for_completed(timeout=30)
-    print("got action result", result)
-
-    anim = robot.play_anim_trigger(cozmo.anim.Triggers.MajorWin)
-    cube.set_light_corners(None, None, None, None)
-    anim.wait_for_completed()
-
-def Handle_Move_Photo_Action(robot: cozmo.robot.Robot, photoPath,  ):
-    initial_pose = robot.pose
-    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
-    sawTheRightOne = False
-    while sawTheRightOne == False:
-        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
-        lookaround.stop()
-        try:
-            reconized_thing2 = obj.object_type
-        except:
-            reconized_thing2 = None
-        if reconized_thing2 == CustomObjectTypes.CustomType14:
-            sawTheRightOne = True
-            time.sleep(0.1)
-    TakePhoto(robot, photoPath)
-    action_for_marker_14(robot)
-    robot.go_to_pose(initial_pose).wait_for_completed()
-    alreadyDoneImages.append(CustomObjectTypes.CustomType14)
-
+#Actual start point
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
