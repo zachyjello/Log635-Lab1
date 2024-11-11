@@ -582,7 +582,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType15)
                     break
-
+    
     print("I'm done here, it's getting dark in here, goodbye")
     while True:
         time.sleep(0.1)
@@ -712,5 +712,28 @@ def cozmo_pickup_nearby_cube(robot: cozmo.robot.Robot):
     anim = robot.play_anim_trigger(cozmo.anim.Triggers.MajorWin)
     cube.set_light_corners(None, None, None, None)
     anim.wait_for_completed()
+
+def create_walls(robot: cozmo.robot.Robot):
+
+    #Horizontal
+    wall1 = Pose(-400,400,0, angle_z=degrees(0))
+    wall1 = robot.world.create_custom_fixed_object(wall1, 10, 400, 50, relative_to_robot=False)
+    wall2 = Pose(-200,400,0, angle_z=degrees(0))
+    wall2 = robot.world.create_custom_fixed_object(wall2, 10, 400, 50, relative_to_robot=False)
+    wall3 = Pose(100,400,0, angle_z=degrees(0))
+    wall3 = robot.world.create_custom_fixed_object(wall3, 10, 400, 50, relative_to_robot=False)
+    wall4 = Pose(400,400,0, angle_z=degrees(0))
+    wall4 = robot.world.create_custom_fixed_object(wall4, 10, 400, 50, relative_to_robot=False)
+    wall5 = Pose(-200,0,0, angle_z=degrees(0))
+    wall5 = robot.world.create_custom_fixed_object(wall5, 10, 250, 50, relative_to_robot=False)
+    wall6 = Pose(100,0,0, angle_z=degrees(0))
+    wall6 = robot.world.create_custom_fixed_object(wall6, 10, 300, 50, relative_to_robot=False)
+    
+    #vertical
+    wall7 = Pose(-400,800,0, angle_z=degrees(0))
+    wall7 = robot.world.create_custom_fixed_object(wall7, 10, 800, 50, relative_to_robot=False)
+    wall8 = Pose(-350,0,0, angle_z=degrees(0))
+    wall8 = robot.world.create_custom_fixed_object(wall8, 10, 750, 50, relative_to_robot=False)
+    
 
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
