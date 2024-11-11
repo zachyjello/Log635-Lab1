@@ -7,14 +7,13 @@ from PIL import Image
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3
 
-#Global variables
 alreadyDoneImages = []
 liveCamera = False
 fullPath = "photos"
 index = 0
 
-# Create the directory to place the pictures
 def createAllDirectories():
+    # Indiquer le dossier pour stocker les photos
     if not os.path.exists('photos'):
         os.makedirs('photos')
     if not os.path.exists('photos/Triangles'):
@@ -58,8 +57,22 @@ def createAllDirectories():
     if not os.path.exists('photos/Circles/Circle5'):
         os.makedirs('photos/Circles/Circle5')
 
-#Take a picture and save it in the good directory
-#Take care of looking in the directory to adjust the file name
+#TRY
+def move_in_front_of_object(robot:cozmo.robot.Robot, obj, distance_from_object_mm=100):
+    # Get object's pose
+    object_pose = obj.pose
+
+    # Calculate position in front of the object
+    #distance = distance_mm(distance_from_object_mm)
+    target_x = object_pose.position.x - distance_from_object_mm * object_pose.rotation.cos_z
+    target_y = object_pose.position.y - distance_from_object_mm * object_pose.rotation.sin_z
+    target_angle = object_pose.rotation.angle_z.degrees  # Same angle as the object
+
+    # Move Cozmo to the target position and face the object
+    target_pose = Pose(target_x, target_y, 0, angle_z=degrees(target_angle))
+    robot.go_to_pose(target_pose).wait_for_completed()
+#TRY
+
 def on_new_camera_image(evt, **kwargs):    
     global liveCamera
     global fullPath
@@ -67,25 +80,25 @@ def on_new_camera_image(evt, **kwargs):
         print("Cozmo is taking a photo")
         pilImage = kwargs['image'].raw_image
         existing_photos = [f for f in os.listdir(fullPath) if f.startswith("photo_") and f.endswith(".jpg")]
-        photo_count = len(existing_photos)
+        photo_count = len(existing_photos)  # Count of existing photos
+
+        # Increment the count for the new photo
         new_photo_index = photo_count + 1
-        filename = f"photo_{new_photo_index:02d}.jpg"
+        filename = f"photo_{new_photo_index:02d}.jpg"  # Format with leading zero
         fullPathModified = os.path.join(fullPath, filename)
 
         pilImage.save(fullPathModified, "JPEG")
-        liveCamera = False
 
-#Start the photo action(live camera)
 def TakePhoto(robot: cozmo.robot.Robot, path):
     global liveCamera
     global fullPath
     fullPath=path
-    # Head and arms of cozmo set
-    robot.set_head_angle(degrees(5.0)).wait_for_completed()
+    # Assurez-vous que la tête et le bras de Cozmo sont à un niveau raisonnable
+    robot.set_head_angle(degrees(10.0)).wait_for_completed()
     robot.set_lift_height(0.0).wait_for_completed()
 
     liveCamera = True
-    time.sleep(0.3)    
+    time.sleep(0.1)    
     liveCamera = False
 
 
@@ -99,46 +112,38 @@ def action_for_marker_1(robot: cozmo.robot.Robot):
     print("I do action 1")
     robot.play_anim_trigger(cozmo.anim.Triggers.Surprise).wait_for_completed()
 
-#TALK
+#STACK CUBES
 def action_for_marker_2(robot: cozmo.robot.Robot):
     print("I do action 2")
     robot.say_text("Pokemon, gotta catch em' all!").wait_for_completed()
 
-#RECONIZE FACE
 def action_for_marker_3(robot: cozmo.robot.Robot):
     print("I do action 3")
     light_when_face(robot)
 
-#MOVE
 def action_for_marker_4(robot: cozmo.robot.Robot):
     print("I do action 4")
     cozmo_move_around(robot)
 
-#TALK
 def action_for_marker_5(robot: cozmo.robot.Robot):
     print("I do action 5")
     robot.say_text("I will be the very best").wait_for_completed()
 
-#EMOTION
 def action_for_marker_6(robot: cozmo.robot.Robot):
     print("I do action 6")
     robot.play_anim_trigger(robot.anim_triggers[3]).wait_for_completed()
 
-#TALK
 def action_for_marker_7(robot: cozmo.robot.Robot):
     print("I do action 7")
     robot.say_text("Pikachu I choose you").wait_for_completed()
 
-#TALK
 def action_for_marker_8(robot: cozmo.robot.Robot):
     print("I do action 8")
-    robot.say_text("Pikachu I'm glad I chose you").wait_for_completed()
+    robot.say_text("Pikachu I'm glad I choosed you").wait_for_completed()
 
-#IMAGE ON FACE
 def action_for_marker_9(robot: cozmo.robot.Robot):
     show_pokemon_pic(robot)
 
-#MOVE
 def action_for_marker_10(robot: cozmo.robot.Robot):
     print("I do action 10")
     robot.drive_straight(distance_mm(-75), speed_mmps(100)).wait_for_completed()
@@ -146,47 +151,46 @@ def action_for_marker_10(robot: cozmo.robot.Robot):
     robot.drive_straight(distance_mm(-75), speed_mmps(100)).wait_for_completed()
     nothing = True
 
-#TALK
 def action_for_marker_11(robot: cozmo.robot.Robot):
     print("I do action 11")
     robot.say_text("A legendary bird, launch the master ball").wait_for_completed()
 
-#MOVE
 def action_for_marker_12(robot: cozmo.robot.Robot):
     print("I do action 12")
     #This is mine Zach touch it and you died: no <3 Je t'aime Zach
-    robot.drive_straight(distance_mm(-150), speed_mmps(100)).wait_for_completed()
-    robot.turn_in_place(degrees(180)).wait_for_completed()
-    robot.turn_in_place(degrees(180)).wait_for_completed()
-    robot.turn_in_place(degrees(180)).wait_for_completed()
+    robot.turn_in_place(degrees(45)).wait_for_completed()
+    robot.drive_straight(distance_mm(75), speed_mmps(100)).wait_for_completed()
+    robot.turn_in_place(degrees(-45)).wait_for_completed()
+    robot.drive_straight(distance_mm(75), speed_mmps(100)).wait_for_completed()
+    robot.turn_in_place(degrees(-90)).wait_for_completed()
+    robot.drive_straight(distance_mm(75), speed_mmps(100)).wait_for_completed()
+    robot.turn_in_place(degrees(-45)).wait_for_completed()
+    robot.drive_straight(distance_mm(75), speed_mmps(100)).wait_for_completed()
 
-#EMOTION
 def action_for_marker_13(robot: cozmo.robot.Robot):
     print("I do action 13")
     robot.play_anim_trigger(robot.anim_triggers[5]).wait_for_completed()
 
-#CUBES
+
 def action_for_marker_14(robot: cozmo.robot.Robot):
     global index
     print("I do action 14")
     index += 1
     cozmo_cube_action(robot, index)
 
-#CUBES
 def action_for_marker_15(robot: cozmo.robot.Robot):
     global index
     print("I do action 15")
     index += 1
     cozmo_cube_action(robot, index)
 
-#Main function to declare custom object and marker's logics
 def cozmo_program(robot: cozmo.robot.Robot):
     createAllDirectories()
     
-    # Each time Cozmo see a new image it take a picture
+    # Chaque fois que Cozmo voit une "nouvelle" image, prends une photo
     robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)
 
-    #Create custom objects
+    #Création des objets customs
     robot.world.define_custom_wall(CustomObjectTypes.CustomType00,
                                    CustomObjectMarkers.Triangles2,
                                    50, 58, 26, 26, True)
@@ -238,196 +242,352 @@ def cozmo_program(robot: cozmo.robot.Robot):
     robot.world.define_custom_wall(CustomObjectTypes.CustomType15,
                                    CustomObjectMarkers.Hexagons5,
                                    50, 58, 26, 26, True)
-    
-    robot.set_lift_height(0.0).wait_for_completed()
 
-    time.sleep(2)
-    print(robot.pose)
+    time.sleep(1)
+
     while len(alreadyDoneImages) < 16:
-        # Lookaround to find the objects declared 
+        # Chercher les objets
         lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
         object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
         lookaround.stop()
+        # visible_objects = robot.world.visible_objects
+        #detected_objects = robot.world.visible_objects
+        i = 0
         for obj in object_found:
+            # Vérifiez si l'objet est un marqueur que vous surveillez
             try:
                 reconized_thing = obj.object_type
-                position = obj.pose
+                print(obj)
             except:
-                reconized_thing = None #There if it sees lightcubes or charger
+                reconized_thing = None
             if reconized_thing not in alreadyDoneImages:
-                #Gestion of all actions (could be refactor one day)
-                if reconized_thing == CustomObjectTypes.CustomType00: 
-                    print("Recognize custom type 00")
+                if reconized_thing == CustomObjectTypes.CustomType00:
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
-                    TakePhoto(robot, "photos/Triangles/Triangle2/")
+                    robot.drive_straight(distance_mm(200), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType00:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
+                    TakePhoto(robot, "photos/Triangles/Triangle2/") #TODO: For each picture make sure you're in front, so hardcode some position
                     action_for_marker_0(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
+                    
                     alreadyDoneImages.append(CustomObjectTypes.CustomType00)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType01:
-                    print("Recognize custom type 01")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType01:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Circles/Circle2/")
                     action_for_marker_1(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType01)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType02:
-                    print("Recognize custom type 02")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType02:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Diamonds/Diamond2/")
                     action_for_marker_2(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType02)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType03:
-                    print("Recognize custom type 03")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType03:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Hexagons/Hexagon2/")
                     action_for_marker_3(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType03)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType04:
-                    print("Recognize custom type 04")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType04:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Triangles/Triangle3/")
                     action_for_marker_4(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType04)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType05:
-                    print("Recognize custom type 05")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType05:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Circles/Circle3/")
                     action_for_marker_5(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType05)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType06:
-                    print("Recognize custom type 06")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType06:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Diamonds/Diamond3/")
                     action_for_marker_6(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType06)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType07:
-                    print("Recognize custom type 07")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType07:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Hexagons/Hexagon3/")
                     action_for_marker_7(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType07)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType08:
-                    print("Recognize custom type 08")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType08:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Triangles/Triangle4/")
                     action_for_marker_8(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType08)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType09:
-                    print("Recognize custom type 09")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType09:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Circles/Circle4/")
                     action_for_marker_9(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType09)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType10:
-                    print("Recognize custom type 10")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType10:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Diamonds/Diamond4/")
                     action_for_marker_10(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType10)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType11:
-                    print("Recognize custom type 11")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType11:
+                            sawTheRightOne = True
+                        time.sleep(0.1)
                     TakePhoto(robot, "photos/Hexagons/Hexagon4/")
                     action_for_marker_11(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType11)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType12:
-                    print("Recognize custom type 12")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType12:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Triangles/Triangle5/")
                     action_for_marker_12(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType12)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType13:
-                    print("Recognize custom type 13")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType13:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Circles/Circle5/")
                     action_for_marker_13(robot)
                     robot.go_to_pose(initial_pose).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType13)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType14:
-                    print("Recognize custom type 14")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.9).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType14:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Diamonds/Diamond5/")
                     action_for_marker_14(robot)
-                    time.sleep(0.1)
                     robot.go_to_pose(initial_pose).wait_for_completed()
-                    robot.go_to_pose(Pose(0,0,0,1.00,0.00,0.00,-0.08)).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType14)
                     break
                 if reconized_thing == CustomObjectTypes.CustomType15:
-                    print("Recognize custom type 15")
                     initial_pose = robot.pose
-                    robot.go_to_pose(position*0.7).wait_for_completed()
-                    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
-                    
+                    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+                    sawTheRightOne = False
+                    while sawTheRightOne == False:
+                        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+                        object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60)
+                        lookaround.stop()
+                        try:
+                            reconized_thing2 = obj.object_type
+                        except:
+                            reconized_thing2 = None
+                        if reconized_thing2 == CustomObjectTypes.CustomType15:
+                            sawTheRightOne = True
+                            time.sleep(0.1)
                     TakePhoto(robot, "photos/Hexagons/Hexagon5/")
                     action_for_marker_15(robot)
-                    time.sleep(0.1)
                     robot.go_to_pose(initial_pose).wait_for_completed()
-                    robot.go_to_pose(Pose(0,0,0,1.00,0.00,0.00,-0.08)).wait_for_completed()
                     alreadyDoneImages.append(CustomObjectTypes.CustomType15)
                     break
 
-    #End of program, means all 16 actions have been done
     print("I'm done here, it's getting dark in here, goodbye")
     while True:
         time.sleep(0.1)
 
-#Linked with Face detection action, look and wait for a head before saying something
+    
 def light_when_face(robot: cozmo.robot.Robot):
     '''The core of the light_when_face program'''
 
@@ -444,7 +604,7 @@ def light_when_face(robot: cozmo.robot.Robot):
         if face and face.is_visible:
             robot.set_all_backpack_lights(cozmo.lights.blue_light)
             hasNotSeenFace = False
-            robot.say_text("Pikachu Detected").wait_for_completed()
+            robot.say_text("Soyboy Detected").wait_for_completed()
         else:
             robot.set_backpack_lights_off()
 
@@ -457,26 +617,22 @@ def light_when_face(robot: cozmo.robot.Robot):
 
         time.sleep(.1)
 
-#Linked to mouvment function, move around
 def cozmo_move_around (robot: cozmo.robot.Robot):
     # Drive forwards for 150 millimeters at 50 millimeters-per-second.
-    robot.drive_straight(distance_mm(-100), speed_mmps(50)).wait_for_completed()
+    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
 
     # Turn 90 degrees to the left.
     # Note: To turn to the right, just use a negative number.
-    robot.turn_in_place(degrees(90)).wait_for_completed()
-
-    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
-
     robot.turn_in_place(degrees(180)).wait_for_completed()
 
-    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
+    robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed();
 
-#Linked with image action, display pokemon on face
 def show_pokemon_pic (robot: cozmo.robot.Robot):
     current_directory = os.path.dirname(os.path.realpath(__file__))
+    #Formule ETS is cool
     # resize to fit on Cozmo's face screen
     imagePokemon = os.path.join(current_directory, "Pokemon.png")
+    #imagePokemon = os.path.join(current_directory, "cozmosdk.png")
     resized_image = Image.open(imagePokemon).resize(cozmo.oled_face.dimensions(), Image.BICUBIC)
 
     # convert the image to the format used by the oled screen
@@ -484,7 +640,6 @@ def show_pokemon_pic (robot: cozmo.robot.Robot):
                                                                 invert_image=True)
     robot.display_oled_face_image(face_image, 10000).wait_for_completed()
 
-#NOT WORKING FUNCTION, should have played pokemon theme song, but couldn't make it fast enough
 def cozmo_jam_out (robot: cozmo.robot.Robot):
     notes = [
         cozmo.song.SongNote(cozmo.song.NoteTypes.A2, cozmo.song.NoteDurations.Half),
@@ -502,19 +657,60 @@ def cozmo_jam_out (robot: cozmo.robot.Robot):
         cozmo.song.SongNote(cozmo.song.NoteTypes.F2, cozmo.song.NoteDurations.Quarter),
         cozmo.song.SongNote(cozmo.song.NoteTypes.G2, cozmo.song.NoteDurations.Half)
         ]
-    robot.play_song(notes, loop_count=1).wait_for_completed()
-
-#Linked with cubes function, should Stack and KnockOver cubes
+    robot.play_song(notes, loop_count=1).wait_for_completed();
+    
 def cozmo_cube_action(robot: cozmo.robot.Robot, index: int):
     time.sleep(5)
     if(index == 1):
         robot.world.get_light_cube(cozmo.objects.LightCube1Id).set_lights(cozmo.lights.green_light.flash())
-        robot.world.get_light_cube(cozmo.objects.LightCube2Id).set_lights(cozmo.lights.green_light.flash())
         robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.StackBlocks, active_time=60)
     if(index == 2):
-        robot.world.get_light_cube(cozmo.objects.LightCube1Id).set_lights(cozmo.lights.red_light.flash())
-        robot.world.get_light_cube(cozmo.objects.LightCube2Id).set_lights(cozmo.lights.red_light.flash())
+        robot.world.get_light_cube(cozmo.objects.LightCube1Id).set_lights(cozmo.lights.green_light.flash())
         robot.run_timed_behavior(cozmo.behavior.BehaviorTypes.KnockOverCubes, active_time=60)
+    
+def cozmo_pickup_nearby_cube(robot: cozmo.robot.Robot):
+    look_around = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
 
-#Actual start point
+    # try to find a block
+    cube = None
+
+    try:
+        cube = robot.world.wait_for_observed_light_cube(timeout=30)
+        print("Found cube", cube)
+
+    except asyncio.TimeoutError:
+        print("Didn't find a cube :-(")
+
+    finally:
+        # whether we find it or not, we want to stop the behavior
+        look_around.stop()
+
+    if cube is None:
+        robot.play_anim_trigger(cozmo.anim.Triggers.MajorFail)
+        return
+
+    print("Yay, found cube")
+
+    cube.set_lights(cozmo.lights.green_light.flash())
+
+    anim = robot.play_anim_trigger(cozmo.anim.Triggers.BlockReact)
+    anim.wait_for_completed()
+
+
+    action = robot.pickup_object(cube)
+    print("got action", action)
+    result = action.wait_for_completed(timeout=30)
+    print("got action result", result)
+
+    robot.turn_in_place(degrees(90)).wait_for_completed()
+
+    action = robot.place_object_on_ground_here(cube)
+    print("got action", action)
+    result = action.wait_for_completed(timeout=30)
+    print("got action result", result)
+
+    anim = robot.play_anim_trigger(cozmo.anim.Triggers.MajorWin)
+    cube.set_light_corners(None, None, None, None)
+    anim.wait_for_completed()
+
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
