@@ -16,7 +16,9 @@ index = 0
 HAUTEUR_MUR = 50
 LARGEUR_MUR = 10
 
-# Points d'arrêt pour Cozmo
+# Points d'arrêt pour Cozmo (Labo3)
+
+arret_depart = Pose(0, 400, 0, angle_z=degrees(0))
 arret_a = Pose(-200, 800, 0, angle_z=degrees(0))
 arret_b = Pose(100, 800, 0, angle_z=degrees(0))
 arret_c = Pose(-200, 250, 0, angle_z=degrees(90))
@@ -197,6 +199,7 @@ def action_for_marker_15(robot: cozmo.robot.Robot):
 def cozmo_program(robot: cozmo.robot.Robot):
     createAllDirectories()
     
+    #
     # Chaque fois que Cozmo voit une "nouvelle" image, prends une photo
     robot.add_event_handler(cozmo.world.EvtNewCameraImage, on_new_camera_image)
 
@@ -597,13 +600,16 @@ def cozmo_program(robot: cozmo.robot.Robot):
     while True:
         time.sleep(0.1)
 
-
+    
     # labo 3 
     robot.world.delete_all_custom_objects()  # Supprimer tous les objets existants
     print(robot.pose.position) 
     
     create_walls(robot)  # Créer les murs
 
+    # Positionner Cozmo au (0,400)
+    robot.go_to_pose(arret_depart, relative_to_robot=False).wait_for_completed()
+    
     # Déplacer le robot vers les différents points d'arrêt
     robot.go_to_pose(arret_a, relative_to_robot=False).wait_for_completed()
     robot.go_to_pose(arret_b, relative_to_robot=False).wait_for_completed()
@@ -739,23 +745,26 @@ def cozmo_pickup_nearby_cube(robot: cozmo.robot.Robot):
 
 def create_walls(robot: cozmo.robot.Robot):
      # --- MURS HORIZONTAUX ---
-    mur1 = Pose(-350, 0, 0, angle_z=degrees(0))  # Mur du bas de (-350,0) à (400,0)
+    mur1 = Pose(0, 0, 0, angle_z=degrees(0))  # Mur du bas de (-400,0) à (400,0)
     robot.world.create_custom_fixed_object(mur1, 750, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
     
-    mur2 = Pose(-400, 400, 0, angle_z=degrees(0))  # Mur du haut de (-400,400) à (400,400)
+    mur2 = Pose(0, 400, 0, angle_z=degrees(0))  # Mur du haut de (-400,400) à (400,400)
     robot.world.create_custom_fixed_object(mur2, 800, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
 
+    mur7 = Pose(0, 800, 0, angle_z=degrees(0))  # Mur du haut de (-400,800) à (400,800)
+    robot.world.create_custom_fixed_object(mur7, 800, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
+
     # --- MURS VERTICAUX ---
-    mur3 = Pose(-400, 400, 0, angle_z=degrees(90))  # Mur de gauche de (-400,400) à (-400,800)
+    mur3 = Pose(-400, 600, 0, angle_z=degrees(90))  # Mur de gauche de (-400,400) à (-400,800)
     robot.world.create_custom_fixed_object(mur3, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
     
-    mur4 = Pose(-200, 400, 0, angle_z=degrees(90))  # Mur vertical gauche de (-200,400) à (-200,800)
+    mur4 = Pose(-200, 600, 0, angle_z=degrees(90))  # Mur vertical gauche de (-200,400) à (-200,800)
     robot.world.create_custom_fixed_object(mur4, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
 
-    mur5 = Pose(100, 400, 0, angle_z=degrees(90))  # Mur vertical central de (100,400) à (100,800)
+    mur5 = Pose(100, 600, 0, angle_z=degrees(90))  # Mur vertical central de (100,400) à (100,800)
     robot.world.create_custom_fixed_object(mur5, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
 
-    mur6 = Pose(400, 400, 0, angle_z=degrees(90))  # Mur de droite de (400,400) à (400,800)
+    mur6 = Pose(400, 600, 0, angle_z=degrees(90))  # Mur de droite de (400,400) à (400,800)
     robot.world.create_custom_fixed_object(mur6, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
 
     
