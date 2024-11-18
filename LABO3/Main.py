@@ -7,8 +7,9 @@ from Scene import Scene
 
 #Main
 def cozmo_program():
-    Scene.create_walls()
+    Scene.create_walls(cozmo.robot.Robot)
     Scene.plot_walls()
+    Scene.posDepart(cozmo.robot.Robot)
 
 
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
