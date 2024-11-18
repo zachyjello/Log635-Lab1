@@ -3,12 +3,13 @@ from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, 
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3
 from Scene import Scene
 from CrimeInference import CrimeInference
+from LABO3.Scene import Scene
 #from Scenario import Scenario
 #from Rules import Rules
 
 #Main
-def cozmo_program():
-    Scene.create_walls()
+def cozmo_program(robot : cozmo.robot.Robot):
+    Scene.create_walls(robot)
     Scene.plot_walls()
     Scene.placeHint()
     
@@ -23,4 +24,6 @@ def cozmo_program():
     print("Personnes innocentes : ", agent.get_innocent())
 
 
+    Scene.posDepart(robot)
+    
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
