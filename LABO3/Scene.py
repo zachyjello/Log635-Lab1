@@ -18,7 +18,7 @@ def create_walls(robot: cozmo.robot.Robot):
     robot.world.create_custom_fixed_object(mur2, 800, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
 
     mur7 = Pose(25, -400, 0, angle_z=degrees(0))  
-    robot.world.create_custom_fixed_object(mur7, 800, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
+    robot.world.create_custom_fixed_object(mur7, 750, LARGEUR_MUR, HAUTEUR_MUR, relative_to_robot=False)
 
     # --- MURS VERTICAUX ---
     mur3 = Pose(-400, 400, 0, angle_z=degrees(90))  
@@ -31,7 +31,7 @@ def create_walls(robot: cozmo.robot.Robot):
     robot.world.create_custom_fixed_object(mur5, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
 
     mur6 = Pose(400, 200, 0, angle_z=degrees(90))  
-    robot.world.create_custom_fixed_object(mur6, HAUTEUR_MUR, 400, LARGEUR_MUR, relative_to_robot=False)
+    robot.world.create_custom_fixed_object(mur6, HAUTEUR_MUR, 1200, LARGEUR_MUR, relative_to_robot=False)
 
 def posDepart (robot: cozmo.robot.Robot) :
     print(robot.pose.position)
