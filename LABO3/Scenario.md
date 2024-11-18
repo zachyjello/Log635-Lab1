@@ -25,7 +25,7 @@ Armes:
 
 
 1-Dracaufeu est mort entre 17h et 20h  
-2-Pikachu était à BourgPalette entre 16h et 19h  
+2-Pikachu était à Lavanville entre 16h et 19h  
 3-Dracaufeu a été trouvé à Lavanville  
 4-Dracaufeu est mort explosé avec la grenade  
 5-Une grenade était à Lavanville à 18h
@@ -33,10 +33,18 @@ Armes:
 
 6-Le poison était à CarminSurMer à 20h  
 7-Évoli était à Celadopole entre 21h et 22h 
-8-La Tronçonneuse était à Jadille à 17h
+8-La Tronçonneuse était à Jadielle à 17h
 9-Le PistoletAEau était à Azuria à 18h
-10-Carapuce était à au BourgPalette entre 16h et 18h
+10-Carapuce était au BourgPalette entre 16h et 18h
 11-Ectoplasma était à Azuria entre 19h et 21h
 12-Herbizarre était à CarminSurMer entre 18h et 19h
 13-La BatteBaseballAvecClous était à CarminSurMer à 22h
+14-Le LanceFlamme était à Celadopole à 14h
 
+BREF: 
+BourgPalette: Carapuce  
+Azuria: PistoletAEau, Ectoplasma  
+Jadielle: Tronçonneuse  
+Lavanville: Dracaufeu(cube victime), Pikachu(cube villain), grenade  
+Celadopole: Evoli, LanceFlamme  
+CarminSurMer: Poison, Herbizarre, BatteBaseballAvecClous, PRISON  

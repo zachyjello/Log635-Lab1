@@ -9,6 +9,7 @@ from Scene import Scene
 def cozmo_program():
     Scene.create_walls()
     Scene.plot_walls()
+    Scene.placeHint()
 
 
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
