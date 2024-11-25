@@ -52,52 +52,100 @@ CarminSurMer: Poison, Herbizarre, BatteBaseballAvecClous, PRISON
 '''
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
-from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3
+from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3, Angle
 
-ROOM_1_WAY = [Pose(0,-25), Pose(-300, -25), Pose(-300, 200)]
-ROOM_2_WAY = [Pose(-300, -25), Pose(0, -25), Pose(0, 200)]
-ROOM_3_WAY = [Pose(0, -25), Pose(250, -25), Pose(250, 200)]
-ROOM_4_WAY = [Pose(250,-200)]
-ROOM_5_WAY = [Pose(250, -25), Pose(0, -25), Pose(0, -200)]
-ROOM_6_WAY = [Pose(0,-25), Pose(-300, -25), Pose(-300,-200)]
-GO_FETCH_VILLAIN_WAY = [Pose(-300,-25), Pose(250, -25), Pose(250, -200)]
-BRING_HIM_TO_PRISON_WAY = [Pose(250, -25), Pose(-300, -25), Pose(-300, -200)]
+ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, 175, 0, angle_z=Angle(0))]
+ROOM_2_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 175, 0, angle_z=Angle(0))]
+ROOM_3_WAY = [Pose(0, 0, 0, angle_z=Angle(0)), Pose(300, 0, 0, angle_z=Angle(0)), Pose(300, 200, 0, angle_z=Angle(0))]
+ROOM_4_WAY = [Pose(300,-175, 0, angle_z=Angle(0))]
+ROOM_5_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, -175, 0, angle_z=Angle(0))]
+ROOM_6_WAY = [Pose(0,0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300,-175, 0, angle_z=Angle(0))]
+GO_FETCH_VILLAIN_WAY = [Pose(-300,0, 0, angle_z=Angle(0)), Pose(300, 0, 0, angle_z=Angle(0)), Pose(300, -175, 0, angle_z=Angle(0))]
+BRING_HIM_TO_PRISON_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, -175, 0, angle_z=Angle(0))]
 
 
 class Scenario:
     def init():
         pass
 
-    def room1(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_1_WAY)
+    def room1(self, robot: cozmo.robot.Robot):
+        print("Room1")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_1_WAY)
         #Ask questions
         #Receive answers
-    def room2(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_2_WAY)
+    def room2(self, robot: cozmo.robot.Robot):
+        print("Room2")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_2_WAY)
         #Ask questions
         #Receive answers
-    def room3(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_3_WAY)
+    def room3(self, robot: cozmo.robot.Robot):
+        print("Room3")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
         #Ask questions
         #Receive answers
-    def room4(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_4_WAY)
+        self.flip_cube(robot)
+        
+    def room4(self, robot: cozmo.robot.Robot):
+        print("Room4")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_4_WAY)
         #Ask questions
         #Receive answers
-    def room5(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_5_WAY)
+    def room5(self, robot: cozmo.robot.Robot):
+        print("Room5")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_5_WAY)
         #Ask questions
         #Receive answers
-    def room6(self):
-        self.justMoveToListOfPoseImSayingLittleDevil(ROOM_6_WAY)
+    def room6(self, robot: cozmo.robot.Robot):
+        print("Room6")
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_6_WAY)
         #Ask questions
         #Receive answers
-    def endGame(self):
+    def endGame(self, robot: cozmo.robot.Robot):
         #I KNOW WHO IT IS
-        self.justMoveToListOfPoseImSayingLittleDevil(GO_FETCH_VILLAIN_WAY)
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, GO_FETCH_VILLAIN_WAY)
+        self.tap_and_lift_cube(robot)
         #Hit the cube, take the cube, shit yourself because you can't grab the cube
-        self.justMoveToListOfPoseImSayingLittleDevil(BRING_HIM_TO_PRISON_WAY)
+        self.justMoveToListOfPoseImSayingLittleDevil(robot, BRING_HIM_TO_PRISON_WAY)
+        robot.set_lift_height(0).wait_for_completed()
 
-    def justMoveToListOfPoseImSayingLittleDevil(robot:cozmo.robot.Robot, listOfPose):
+
+    def justMoveToListOfPoseImSayingLittleDevil(self, robot:cozmo.robot.Robot, listOfPose):
         for position in listOfPose:
             robot.go_to_pose(position).wait_for_completed()
+
+    #TODO: MAKE IT WORK (Async problem)
+    def flip_cube(self, robot: cozmo.robot.Robot):
+        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        cube = robot.world.wait_for_observed_light_cube(timeout=30)
+        lookaround.stop()
+        if cube is None:
+            print("Cube not found!")
+            return
+
+        robot.go_to_object(cube, distance_mm(50.0)).wait_for_completed()  # Stop close to the cube
+        action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
+        action.wait_for_completed()
+
+    #TODO: MAKE IT WORK
+    def tap_and_lift_cube(self, robot: cozmo.robot.Robot):
+        # Étape 1 : Attendre que Cozmo détecte un cube
+        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        cube = robot.world.wait_for_observed_light_cube(timeout=30)
+        lookaround.stop()
+        if cube is None:
+            print("Aucun cube détecté !")
+            return
+
+        # Étape 2 : Se rapprocher du cube
+        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+
+        # Étape 3 : Donner une tape avec le lift
+        robot.set_lift_height(1).wait_for_completed()
+        robot.drive_straight(distance_mm(15), speed_mmps(20)).wait_for_completed()
+        robot.set_lift_height(0.5).wait_for_completed()  # Lever le lift à moitié
+        robot.drive_straight(distance_mm(-10), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
+        robot.set_lift_height(0).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+        # Étape 4 : Soulever le cube
+        robot.set_lift_height(1.0).wait_for_completed()  # Lever complètement le lift
+        print("Cube tapé et soulevé avec succès !")
