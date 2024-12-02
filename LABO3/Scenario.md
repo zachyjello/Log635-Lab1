@@ -23,6 +23,12 @@ Armes:
 5-Poison                      USED  
 6-Grenade                     USED  
 
+1-Floraville - Pikachu - BatteBaseballAvecClous
+2-Azuria - Éviolo - WaterGun
+3-Jadielle - Dracaufeu - LanceFlamme            MORT
+4-Lavanville - Ectoplasma - Tronçonneuse
+5-Celadopole - Poison - Carapuce
+6-Rotombourg - Herbizarre - Grenade
 
 
 1-Dracaufeu est mort entre 17h et 20h  
@@ -43,9 +49,9 @@ Armes:
 14-Le LanceFlamme était à Celadopole à 14h
 
 BREF: 
-BourgPalette: Carapuce  
+BourgPalette: Carapuce, Poison
 Azuria: PistoletAEau, Ectoplasma  
-Jadielle: Tronçonneuse  
-Lavanville: Dracaufeu(cube victime), Pikachu(cube villain), grenade  
+Jadielle: Tronçonneuse, Pikachu(cube villain)
+Lavanville: Dracaufeu(cube victime),  grenade  
 Celadopole: Evoli, LanceFlamme  
-Rotombourg: Poison, Herbizarre, BatteBaseballAvecClous, PRISON  
+Rotombourg: Herbizarre, BatteBaseballAvecClous, PRISON  

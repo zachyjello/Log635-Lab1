@@ -22,7 +22,9 @@ def testLift(robot : cozmo.robot.Robot):
         robot.set_lift_height(0).wait_for_completed()
 #Main
 def cozmo_program(robot : cozmo.robot.Robot):
-
+    #Create Crime Inference Motor
+    motor = CrimeInference()
+    
     #TODO: ONLY WORK ON PAPERCLIP CUBE
     def on_cube_tapped(event, *, obj, tap_count, tap_duration, **kw): 
         print("Received a tap event"+ str(event.obj.object_id))
@@ -37,12 +39,12 @@ def cozmo_program(robot : cozmo.robot.Robot):
     #Scene.initializeRulesInferenceAndShit()
     scenario = Scenario()
 
-    #Scenario.room1(scenario, robot)
-    #Scenario.room2(scenario, robot)
-    #Scenario.room3(scenario, robot)
-    #Scenario.room4(scenario, robot)
-    #Scenario.room5(scenario, robot)
-    #Scenario.room6(scenario, robot)
+    #Scenario.room1(scenario, robot, motor)
+    #Scenario.room2(scenario, robot, motor)
+    #Scenario.room3(scenario, robot, motor)
+    #Scenario.room4(scenario, robot, motor)
+    #Scenario.room5(scenario, robot, motor)
+    #Scenario.room6(scenario, robot, motor)
     #Scenario.endGame(scenario, robot)
     
     '''agent = CrimeInference()
