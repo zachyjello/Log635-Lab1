@@ -8,8 +8,9 @@ from Scenario import Scenario
 import time
 
 #ONLY FOR TESTING
-def testLift(robot : cozmo.robot.Robot):
-    lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+def testLift(robot : cozmo.robot.Robot, scenario: Scenario):
+
+    """lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
     cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)
     lookaround.stop()
     time.sleep(1)
@@ -19,31 +20,45 @@ def testLift(robot : cozmo.robot.Robot):
         print(f"Postion (x_y_z):{cube.pose.position.x_y_z}")
         robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
         robot.set_lift_height(1).wait_for_completed()
-        robot.set_lift_height(0).wait_for_completed()
+        robot.set_lift_height(0).wait_for_completed()"""
+    time.sleep(5)
+    #robot.set_lift_height(0).wait_for_completed()  # Lever le lift à moitié
+    scenario.tap_and_lift_cube(robot)
+    #scenario.flip_cube(robot)
 #Main
 def cozmo_program(robot : cozmo.robot.Robot):
 
+    robot.say_text("Pas de problème de cubes").wait_for_completed()
+    # looks like a paperclip
+    cube1 = robot.world.get_light_cube(LightCube1Id)
+    # looks like a lamp / heart
+    cube2 = robot.world.get_light_cube(LightCube2Id)
+    # looks like the letters 'ab' over 'T'
+    cube3 = robot.world.get_light_cube(LightCube3Id) 
+
+    print(str(cube1) + "\n" + str(cube2) + "\n" + str(cube3))
+
     #TODO: ONLY WORK ON PAPERCLIP CUBE
     def on_cube_tapped(event, *, obj, tap_count, tap_duration, **kw): 
-        print("Received a tap event"+ str(event.obj.object_id))
+        print("Received a tap event "+ str(event.obj.object_id))
 
     handler = robot.add_event_handler(cozmo.objects.EvtObjectTapped,on_cube_tapped)
     #pos = robot.pose
     Scene.create_walls(robot)
     #Scene.posDepart(robot)
-    testLift(robot)
 
     #Scene.initializeObjects()
     #Scene.initializeRulesInferenceAndShit()
     scenario = Scenario()
+    #testLift(robot, scenario)
 
-    #Scenario.room1(scenario, robot)
-    #Scenario.room2(scenario, robot)
-    #Scenario.room3(scenario, robot)
-    #Scenario.room4(scenario, robot)
-    #Scenario.room5(scenario, robot)
-    #Scenario.room6(scenario, robot)
-    #Scenario.endGame(scenario, robot)
+    Scenario.room1(scenario, robot)
+    Scenario.room2(scenario, robot)
+    Scenario.room3(scenario, robot)
+    Scenario.room4(scenario, robot)
+    Scenario.room5(scenario, robot)
+    Scenario.room6(scenario, robot)
+    Scenario.endGame(scenario, robot)
     
     '''agent = CrimeInference()
     

@@ -78,12 +78,12 @@ class Scenario:
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_2_WAY)
         #Ask questions
         #Receive answers
+        self.flip_cube(robot)
     def room3(self, robot: cozmo.robot.Robot):
         print("Room3")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
         #Ask questions
         #Receive answers
-        self.flip_cube(robot)
         
     def room4(self, robot: cozmo.robot.Robot):
         print("Room4")
@@ -122,9 +122,14 @@ class Scenario:
             print("Cube not found!")
             return
 
-        robot.go_to_object(cube, distance_mm(50.0)).wait_for_completed()  # Stop close to the cube
-        action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
-        action.wait_for_completed()
+        robot.set_lift_height(1).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(0.0)).wait_for_completed()  # Stop close to the cube
+        robot.set_lift_height(0.4).wait_for_completed()
+        robot.drive_straight(distance_mm(-60), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
+
+
+        #action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
+        #action.wait_for_completed()
 
     #TODO: MAKE IT WORK
     def tap_and_lift_cube(self, robot: cozmo.robot.Robot):
@@ -137,15 +142,16 @@ class Scenario:
             return
 
         # Étape 2 : Se rapprocher du cube
-        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(60)).wait_for_completed()
 
         # Étape 3 : Donner une tape avec le lift
         robot.set_lift_height(1).wait_for_completed()
-        robot.drive_straight(distance_mm(15), speed_mmps(20)).wait_for_completed()
+        robot.drive_straight(distance_mm(20), speed_mmps(20)).wait_for_completed()
         robot.set_lift_height(0.5).wait_for_completed()  # Lever le lift à moitié
-        robot.drive_straight(distance_mm(-10), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
+        robot.set_lift_height(1).wait_for_completed()  # Lever le lift à moitié
+        robot.drive_straight(distance_mm(-40), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
         robot.set_lift_height(0).wait_for_completed()
-        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(0)).wait_for_completed()
         # Étape 4 : Soulever le cube
         robot.set_lift_height(1.0).wait_for_completed()  # Lever complètement le lift
         print("Cube tapé et soulevé avec succès !")

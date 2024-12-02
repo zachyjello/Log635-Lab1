@@ -33,16 +33,19 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
     if cube1 is not None:
         cube1.set_lights(cozmo.lights.red_light)
+        print("J'aime cozmo 1")
     else:
         cozmo.logger.warning("Cozmo is not connected to a LightCube1Id cube - check the battery.")
 
     if cube2 is not None:
         cube2.set_lights(cozmo.lights.green_light)
+        print("J'aime cozmo 2")
     else:
         cozmo.logger.warning("Cozmo is not connected to a LightCube2Id cube - check the battery.")
 
     if cube3 is not None:
         cube3.set_lights(cozmo.lights.blue_light)
+        print("J'aime cozmo 3")
     else:
         cozmo.logger.warning("Cozmo is not connected to a LightCube3Id cube - check the battery.")
 
