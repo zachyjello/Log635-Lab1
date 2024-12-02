@@ -102,7 +102,7 @@ class CrimeInference:
 
         # Determiner l'arme du crime
         self.clauses.append(expr('PieceCrime(x) & Arme(y) & Piece_Arme(y, x) ==> ArmeCrime(y)'))
-        self.clauses.append(expr("EstMort(x) & MarqueCou(x) ==> ArmeCrime(Corde)"))
+        self.clauses.append(expr("EstMort(x) & MarqueCou(x) ==> ArmeCrime(Tronconneuse)"))
 
         # Si la personne est morte alors elle est la victime et ce n'est pas un suicide
         self.clauses.append(expr('EstMort(x) ==> Victime(x)'))

@@ -27,7 +27,9 @@ def testLift(robot : cozmo.robot.Robot, scenario: Scenario):
     #scenario.flip_cube(robot)
 #Main
 def cozmo_program(robot : cozmo.robot.Robot):
-
+    #Create Crime Inference Motor
+    motor = CrimeInference()
+    
     robot.say_text("Pas de problème de cubes").wait_for_completed()
     # looks like a paperclip
     cube1 = robot.world.get_light_cube(LightCube1Id)

@@ -66,40 +66,132 @@ BRING_HIM_TO_PRISON_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, a
 
 class Scenario:
     def init():
-        pass
+        print("A quelle heure est morte la victime?")
+        
 
-    def room1(self, robot: cozmo.robot.Robot):
+    def room1(self, robot: cozmo.robot.Robot, motor):
         print("Room1")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_1_WAY)
+        
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = self.FindPokemon(self, robot)
+        print("Je vois " + pokemon)
+        
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est vivant.")
+        
         #Receive answers
-    def room2(self, robot: cozmo.robot.Robot):
+    def room2(self, robot: cozmo.robot.Robot, motor):
         print("Room2")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_2_WAY)
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = self.FindPokemon(self, robot)
+        print("Je vois " + pokemon)
+        
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est vivant.")
         #Receive answers
         self.flip_cube(robot)
     def room3(self, robot: cozmo.robot.Robot):
         print("Room3")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
+        
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = self.FindPokemon(self, robot)
+        print("Je vois " + pokemon)
+        
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est vivant.")
         #Receive answers
         
-    def room4(self, robot: cozmo.robot.Robot):
+    def room4(self, robot: cozmo.robot.Robot, motor):
         print("Room4")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_4_WAY)
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = "Dracaufeu"
+        print("Je vois " + pokemon)
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est mort.")
+        #Dire que le pokemon est tranché
+        motor.add_clause(pokemon + " est tranché.")
         #Receive answers
-    def room5(self, robot: cozmo.robot.Robot):
+    def room5(self, robot: cozmo.robot.Robot, motor):
         print("Room5")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_5_WAY)
+        
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = self.FindPokemon(self, robot)
+        print("Je vois " + pokemon)
+        
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est vivant.")
         #Receive answers
-    def room6(self, robot: cozmo.robot.Robot):
+    def room6(self, robot: cozmo.robot.Robot, motor):
         print("Room6")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_6_WAY)
+        
         #Ask questions
+        room = self.FindRoom(self, robot)
+        print("Je suis présentement dans" + room)
+        weapon = self.FindWeapon(self, robot)
+        print("Je vois l'arme: " + weapon)
+        pokemon = self.FindPokemon(self, robot)
+        print("Je vois " + pokemon)
+        
+        
+        #Dire dans quelle piece se trouve l'arme
+        motor.add_clause(weapon + " est dans la " + room)        
+        #Dire que le pokemon est dans la piece
+        motor.add_clause(pokemon + " est dans la " + room)
+        #Dire que le pokemon est vivant
+        motor.add_clause(pokemon + " est vivant.")
         #Receive answers
+        
     def endGame(self, robot: cozmo.robot.Robot):
         #I KNOW WHO IT IS
         self.justMoveToListOfPoseImSayingLittleDevil(robot, GO_FETCH_VILLAIN_WAY)
@@ -155,3 +247,142 @@ class Scenario:
         # Étape 4 : Soulever le cube
         robot.set_lift_height(1.0).wait_for_completed()  # Lever complètement le lift
         print("Cube tapé et soulevé avec succès !")
+        
+    def FindRoom(self, robot:cozmo.robot.Robot):
+        notFound = True
+        while notFound:
+            lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            for obj in object_found:
+                try:
+                    recognized_thing = obj.object_type
+                    print(obj)
+                except:
+                    recognized_thing = None
+                if recognized_thing == CustomObjectTypes.CustomType00:
+                    notFound = False
+                    return "Floraville"
+                elif recognized_thing == CustomObjectTypes.CustomType03:
+                    notFound = False
+                    return "Azuria"
+                elif recognized_thing == CustomObjectTypes.CustomType06:
+                    notFound = False
+                    return "Jadielle"
+                elif recognized_thing == CustomObjectTypes.CustomType08:
+                    notFound = False
+                    return "Lavanville"
+                elif recognized_thing == CustomObjectTypes.CustomType10:
+                    notFound = False
+                    return "Celadopole"
+                elif recognized_thing == CustomObjectTypes.CustomType13:
+                    notFound = False
+                    return "Rotombourg"
+                
+    def FindWeapon(self, robot:cozmo.robot.Robot):
+        notFound = True
+        while notFound:
+            lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            for obj in object_found:
+                try:
+                    recognized_thing = obj.object_type
+                    print(obj)
+                except:
+                    recognized_thing = None
+                if recognized_thing == CustomObjectTypes.CustomType01:
+                    notFound = False
+                    return "Poison"
+                elif recognized_thing == CustomObjectTypes.CustomType04:
+                    notFound = False
+                    return "WaterGun"
+                elif recognized_thing == CustomObjectTypes.CustomType07:
+                    notFound = False
+                    return "Tronçonneuse"
+                elif recognized_thing == CustomObjectTypes.CustomType09:
+                    notFound = False
+                    return "Grenade"
+                elif recognized_thing == CustomObjectTypes.CustomType11:
+                    notFound = False
+                    return "LanceFlamme"
+                elif recognized_thing == CustomObjectTypes.CustomType14:
+                    notFound = False
+                    return "BatteBaseballAvecClous"
+    
+    def FindPokemon(self, robot:cozmo.robot.Robot):
+        notFound = True
+        while notFound:
+            lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            for obj in object_found:
+                try:
+                    recognized_thing = obj.object_type
+                    print(obj)
+                except:
+                    recognized_thing = None
+                if recognized_thing == CustomObjectTypes.CustomType02:
+                    notFound = False
+                    return "Carapuce"
+                elif recognized_thing == CustomObjectTypes.CustomType05:
+                    notFound = False
+                    return "Ectoplasma"
+                elif recognized_thing == CustomObjectTypes.CustomType12:
+                    notFound = False
+                    return "Evioli"
+                elif recognized_thing == CustomObjectTypes.CustomType15:
+                    notFound = False
+                    return "Herbizarre"
+
+    def mapInit(self, robot: cozmo.robot.Robot):
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType00,
+                                   CustomObjectMarkers.Triangles2,
+                                   50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType01,
+                                    CustomObjectMarkers.Circles2,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
+                                    CustomObjectMarkers.Diamonds2,
+                                    50, 58, 26, 26, True)
+        
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType03,
+                                    CustomObjectMarkers.Hexagons2,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType04,
+                                    CustomObjectMarkers.Triangles3,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType05,
+                                    CustomObjectMarkers.Circles3,
+                                    50, 58, 26, 26, True)
+        
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType06,
+                                    CustomObjectMarkers.Diamonds3,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType07,
+                                    CustomObjectMarkers.Hexagons3,
+                                    50, 58, 26, 26, True)
+    
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType08,
+                                    CustomObjectMarkers.Triangles4,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType09,
+                                    CustomObjectMarkers.Circles4,
+                                    50, 58, 26, 26, True)
+        
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType10,
+                                    CustomObjectMarkers.Diamonds4,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType11,
+                                    CustomObjectMarkers.Hexagons4,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType12,
+                                    CustomObjectMarkers.Triangles5,
+                                    50, 58, 26, 26, True)
+        
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType13,
+                                    CustomObjectMarkers.Circles5,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType14,
+                                    CustomObjectMarkers.Diamonds5,
+                                    50, 58, 26, 26, True)
+        robot.world.define_custom_wall(CustomObjectTypes.CustomType15,
+                                    CustomObjectMarkers.Hexagons5,
+                                    50, 58, 26, 26, True)
