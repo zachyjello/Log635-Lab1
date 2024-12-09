@@ -1,6 +1,6 @@
 # Rule.py
 
-from logic import FolKB, expr, fol_bc_ask 
+from aima.logic import FolKB, expr, fol_bc_ask 
 
 # Liste des personnages, armes, et lieux impliqués
 personnages = ["Pikachu", "Evoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
