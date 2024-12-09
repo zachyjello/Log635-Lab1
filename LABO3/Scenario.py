@@ -102,11 +102,11 @@ class Scenario:
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_1_WAY)
         
         #Ask questions
-        room = self.FindRoom(self, robot)
+        room = self.FindRoom(robot)
         print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
+        weapon = self.FindWeapon(robot)
         print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(self, robot)
+        pokemon = self.FindPokemon(robot)
         print("Je vois " + pokemon)
         
         
@@ -204,7 +204,7 @@ class Scenario:
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_6_WAY)
         
         #Ask questions
-        room = self.FindRoom(self, robot)
+        room = self.FindRoom(robot)
         print("Je suis présentement dans" + room)
         weapon = self.FindWeapon(self, robot)
         print("Je vois l'arme: " + weapon)
