@@ -66,13 +66,13 @@ def cozmo_program(robot : cozmo.robot.Robot):
     scenario = Scenario()
     #testLift(robot, scenario)
 
-    Scenario.room1(scenario, robot)
-    Scenario.room2(scenario, robot)
-    Scenario.room3(scenario, robot)
-    Scenario.room4(scenario, robot)
-    Scenario.room5(scenario, robot)
-    Scenario.room6(scenario, robot)
-    Scenario.endGame(scenario, robot)
+    Scenario.room1(scenario, robot, motor)
+    Scenario.room2(scenario, robot, motor)
+    Scenario.room3(scenario, robot, motor)
+    Scenario.room4(scenario, robot, motor)
+    Scenario.room5(scenario, robot, motor)
+    Scenario.room6(scenario, robot, motor)
+    Scenario.endGame(scenario, robot, motor)
     
     '''agent = CrimeInference()
     
