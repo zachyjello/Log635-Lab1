@@ -5,7 +5,7 @@ import nltk
 class CrimeInference:
 
     def __init__(self):
-        self.weapons = ["Batte de Baseball avec Clous", "Pistolet a Eau", "LanceFlamme", "Tronconneuse", "Poison", "Grenade"]
+        self.weapons = ["BatteBaseball", "PistoletEau", "LanceFlamme", "Tronconneuse", "Poison", "Grenade"]
         self.rooms = ["Floraville", "Azuria", "Jadielle", "Lavanville", "Celadopole", "Rotombourg"]
         self.persons = ["Pikachu", "Evoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
         

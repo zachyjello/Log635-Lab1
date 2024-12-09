@@ -322,10 +322,10 @@ class Scenario:
                     return "Poison"
                 elif recognized_thing == CustomObjectTypes.CustomType04:
                     notFound = False
-                    return "WaterGun"
+                    return "PistoletEau"
                 elif recognized_thing == CustomObjectTypes.CustomType07:
                     notFound = False
-                    return "Tronçonneuse"
+                    return "Tronconneuse"
                 elif recognized_thing == CustomObjectTypes.CustomType09:
                     notFound = False
                     return "Grenade"
@@ -334,7 +334,7 @@ class Scenario:
                     return "LanceFlamme"
                 elif recognized_thing == CustomObjectTypes.CustomType14:
                     notFound = False
-                    return "BatteBaseballAvecClous"
+                    return "BatteBaseball"
     
     def FindPokemon(self, robot:cozmo.robot.Robot):
         notFound = True
