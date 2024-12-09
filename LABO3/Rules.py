@@ -3,7 +3,7 @@
 from logic import FolKB, expr, fol_bc_ask 
 
 # Liste des personnages, armes, et lieux impliqués
-personnages = ["Pikachu", "Évoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
+personnages = ["Pikachu", "Evoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
 lieux = ["Bourg Palette", "Azuria", "Jadielle", "Lavanville", "Celadopole", "Rotombourg"]
 armes = ["BatteBaseballAvecClous", "WaterGun", "LanceFlamme", "Tronçonneuse", "Poison", "Grenade"]
 

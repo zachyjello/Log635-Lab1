@@ -321,7 +321,7 @@ class Scenario:
                     return "Ectoplasma"
                 elif recognized_thing == CustomObjectTypes.CustomType12:
                     notFound = False
-                    return "Evioli"
+                    return "Evoli"
                 elif recognized_thing == CustomObjectTypes.CustomType15:
                     notFound = False
                     return "Herbizarre"
