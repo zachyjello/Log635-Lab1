@@ -53,6 +53,7 @@ CarminSurMer: Poison, Herbizarre, BatteBaseballAvecClous, PRISON
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3, Angle
+import time
 
 ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, 175, 0, angle_z=Angle(0))]
 ROOM_2_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 175, 0, angle_z=Angle(0))]
@@ -65,9 +66,36 @@ BRING_HIM_TO_PRISON_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, a
 
 
 class Scenario:
+
+    cube_reponse=None
+
     def init():
         print("A quelle heure est morte la victime?")
         
+    @classmethod
+    def set_cube_response(cls, reponse):
+        cls.cube_reponse = reponse
+
+    @classmethod
+    def attendre_reponse_cube(cls, timeout=10):
+        start_time = time.time()
+        print("En attente de la réponse...")
+
+        # Boucle jusqu'à ce qu'une réponse soit reçue ou que le timeout soit atteint
+        while cls.cube_response is None and (time.time() - start_time) < timeout:
+            time.sleep(0.1)  # Attendre un petit moment pour ne pas bloquer totalement
+
+        if cls.cube_response is not None:
+            print(f"Réponse reçue : {cls.cube_response}")
+        else:
+            print("Timeout atteint, aucune réponse reçue.")
+
+        # Réinitialiser la réponse pour la prochaine utilisation
+        response = cls.cube_response
+        cls.cube_response = None
+        return response
+
+
 
     def room1(self, robot: cozmo.robot.Robot, motor):
         print("Room1")
@@ -109,6 +137,7 @@ class Scenario:
         #Dire que le pokemon est vivant
         motor.add_clause(pokemon + " est vivant.")
         #Receive answers
+        self.flip_cube(robot)
     def room3(self, robot: cozmo.robot.Robot, motor):
         print("Room3")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
@@ -129,7 +158,6 @@ class Scenario:
         #Dire que le pokemon est vivant
         motor.add_clause(pokemon + " est vivant.")
         #Receive answers
-        self.flip_cube(robot)
         
     def room4(self, robot: cozmo.robot.Robot, motor):
         print("Room4")
@@ -214,9 +242,14 @@ class Scenario:
             print("Cube not found!")
             return
 
-        robot.go_to_object(cube, distance_mm(50.0)).wait_for_completed()  # Stop close to the cube
-        action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
-        action.wait_for_completed()
+        robot.set_lift_height(1).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(0.0)).wait_for_completed()  # Stop close to the cube
+        robot.set_lift_height(0.4).wait_for_completed()
+        robot.drive_straight(distance_mm(-60), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
+
+
+        #action = robot.roll_cube(cube, check_for_object_on_top=True, num_retries=2)
+        #action.wait_for_completed()
 
     #TODO: MAKE IT WORK
     def tap_and_lift_cube(self, robot: cozmo.robot.Robot):
@@ -229,15 +262,16 @@ class Scenario:
             return
 
         # Étape 2 : Se rapprocher du cube
-        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(60)).wait_for_completed()
 
         # Étape 3 : Donner une tape avec le lift
         robot.set_lift_height(1).wait_for_completed()
-        robot.drive_straight(distance_mm(15), speed_mmps(20)).wait_for_completed()
+        robot.drive_straight(distance_mm(20), speed_mmps(20)).wait_for_completed()
         robot.set_lift_height(0.5).wait_for_completed()  # Lever le lift à moitié
-        robot.drive_straight(distance_mm(-10), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
+        robot.set_lift_height(1).wait_for_completed()  # Lever le lift à moitié
+        robot.drive_straight(distance_mm(-40), speed_mmps(20)).wait_for_completed()  # Reculer légèrement
         robot.set_lift_height(0).wait_for_completed()
-        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
+        robot.go_to_object(cube, distance_mm(0)).wait_for_completed()
         # Étape 4 : Soulever le cube
         robot.set_lift_height(1.0).wait_for_completed()  # Lever complètement le lift
         print("Cube tapé et soulevé avec succès !")

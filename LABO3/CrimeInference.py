@@ -1,10 +1,13 @@
 # Permet d'inferer qui est le meurtrier, quand, comment, où il a tué.
+from aima.logic import *
+import nltk
+
 class CrimeInference:
 
     def __init__(self):
         self.weapons = ["Batte de Baseball avec Clous", "Pistolet a Eau", "LanceFlamme", "Tronconneuse", "Poison", "Grenade"]
         self.rooms = ["Floraville", "Azuria", "Jadielle", "Lavanville", "Celadopole", "Rotombourg"]
-        self.persons = ["Pikachu", "Évioli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
+        self.persons = ["Pikachu", "Evoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbizarre"]
         
         # Liste de clauses (faits) qui seront stockées dans la base de connaissance.
         self.clauses = []        
