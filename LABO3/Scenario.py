@@ -110,7 +110,7 @@ class Scenario:
         motor.add_clause(pokemon + " est vivant.")
         #Receive answers
         self.flip_cube(robot)
-    def room3(self, robot: cozmo.robot.Robot):
+    def room3(self, robot: cozmo.robot.Robot, motor):
         print("Room3")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
         
