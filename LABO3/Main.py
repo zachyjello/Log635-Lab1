@@ -44,6 +44,18 @@ def cozmo_program(robot : cozmo.robot.Robot):
     def on_cube_tapped(event, *, obj, tap_count, tap_duration, **kw): 
         print("Received a tap event "+ str(event.obj.object_id))
 
+        if obj.object_id == 3:  
+            if tap_count == 1:
+                print("Réponse : Oui")
+                Scenario.set_cube_response(True)
+            elif tap_count == 2:
+                print("Réponse : Non")
+                Scenario.set_cube_response(False)
+            else:
+                print(f"Tap count: {tap_count} - Pas de réponse définie pour ce nombre de taps.")
+        else:
+            print(f"Cube tapé: {obj.object_id} - Ce n'est pas le cube 3.")
+
     handler = robot.add_event_handler(cozmo.objects.EvtObjectTapped,on_cube_tapped)
     #pos = robot.pose
     Scene.create_walls(robot)

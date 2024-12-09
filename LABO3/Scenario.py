@@ -53,6 +53,7 @@ CarminSurMer: Poison, Herbizarre, BatteBaseballAvecClous, PRISON
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3, Angle
+import time
 
 ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, 175, 0, angle_z=Angle(0))]
 ROOM_2_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 175, 0, angle_z=Angle(0))]
@@ -65,9 +66,36 @@ BRING_HIM_TO_PRISON_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, a
 
 
 class Scenario:
+
+    cube_reponse=None
+
     def init():
         print("A quelle heure est morte la victime?")
         
+    @classmethod
+    def set_cube_response(cls, reponse):
+        cls.cube_reponse = reponse
+
+    @classmethod
+    def attendre_reponse_cube(cls, timeout=10):
+        start_time = time.time()
+        print("En attente de la réponse...")
+
+        # Boucle jusqu'à ce qu'une réponse soit reçue ou que le timeout soit atteint
+        while cls.cube_response is None and (time.time() - start_time) < timeout:
+            time.sleep(0.1)  # Attendre un petit moment pour ne pas bloquer totalement
+
+        if cls.cube_response is not None:
+            print(f"Réponse reçue : {cls.cube_response}")
+        else:
+            print("Timeout atteint, aucune réponse reçue.")
+
+        # Réinitialiser la réponse pour la prochaine utilisation
+        response = cls.cube_response
+        cls.cube_response = None
+        return response
+
+
 
     def room1(self, robot: cozmo.robot.Robot, motor):
         print("Room1")
