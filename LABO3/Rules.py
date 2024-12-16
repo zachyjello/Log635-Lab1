@@ -7,19 +7,6 @@ personnages = ["Pikachu", "Evoli", "Dracaufeu", "Ectoplasma", "Carapuce", "Herbi
 lieux = ["Bourg Palette", "Azuria", "Jadielle", "Lavanville", "Celadopole", "Rotombourg"]
 armes = ["BatteBaseballAvecClous", "WaterGun", "LanceFlamme", "Tronçonneuse", "Poison", "Grenade"]
 
-# les données
-informations = {
-    "Dracaufeu": {"mort": True, "heure_de_mort": (17, 20), "lieu": "Lavanville", "arme": "Grenade"},
-    "Pikachu": {"lieu": "Lavanville", "heure": (16, 19)},
-    "Grenade": {"lieu": "Lavanville", "heure": 18},
-    "Carapuce": {"lieu": "Bourg Palette", "heure": (16, 18)},
-    "Ectoplasma": {"lieu": "Azuria", "heure": (19, 21)},
-    "Herbizarre": {"lieu": "Rotombourg", "heure": (18, 19)},
-    "Evoli": {"lieu": "Celadopole", "heure": (21, 22)},
-    "Tronçonneuse": {"lieu": "Jadielle", "heure": 17},
-    "Poison": {"lieu": "Rotombourg", "heure": 20},
-}
-
 class ReglesInference:
     def __init__(self):
         self.clauses = []
@@ -53,13 +40,3 @@ class ReglesInference:
     
     def add_fact(self, clause_string):
         self.clauses.append(expr(clause_string))
-
-        
-
-# test
-
-''' if __name__ == "__main__":
-    regles = ReglesInference()
-    for clause in regles.get_clauses():
-        print(clause)
-        '''

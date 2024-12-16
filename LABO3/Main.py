@@ -4,29 +4,11 @@ from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3
 from Scene import Scene
 from CrimeInference import CrimeInference
 from Scenario import Scenario
-#from Rules import Rules
 import time
 
+#Compteur de tap sur le cube
 counterTAP = 0
 
-#ONLY FOR TESTING
-def testLift(robot : cozmo.robot.Robot, scenario: Scenario):
-
-    """lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-    cubes = robot.world.wait_until_observe_num_objects(num=1, object_type=cozmo.objects.LightCube, timeout=60)
-    lookaround.stop()
-    time.sleep(1)
-    for cube in cubes:
-        print(f"Cube id:{cube.cube_id}")
-        print(f"Postion (x,y,z):{cube.pose.position.x, cube.pose.position.y, cube.pose.position.z}")
-        print(f"Postion (x_y_z):{cube.pose.position.x_y_z}")
-        robot.go_to_object(cube, distance_mm(20)).wait_for_completed()
-        robot.set_lift_height(1).wait_for_completed()
-        robot.set_lift_height(0).wait_for_completed()"""
-    time.sleep(5)
-    #robot.set_lift_height(0).wait_for_completed()  # Lever le lift à moitié
-    scenario.tap_and_lift_cube(robot)
-    #scenario.flip_cube(robot)
 #Main
 def cozmo_program(robot : cozmo.robot.Robot):
     #Create Crime Inference Motor
@@ -58,16 +40,17 @@ def cozmo_program(robot : cozmo.robot.Robot):
         else:
             print(f"Cube tapé: {obj.object_id} - Ce n'est pas le cube 2.")
 
+    #Reagit quand on tape sur le cube
     handler = robot.add_event_handler(cozmo.objects.EvtObjectTapped,on_cube_tapped)
-    #pos = robot.pose
-    Scene.create_walls(robot)
-    #Scene.posDepart(robot)
 
-    #Scene.initializeObjects()
-    #Scene.initializeRulesInferenceAndShit()
+    #Créer les murs dans l'environnement
+    Scene.create_walls(robot)
+
     scenario = Scenario()
-    #testLift(robot, scenario)
+    #Ajoute les markeurs dans l'environnement de cozmo
     Scenario.mapInit(scenario, robot)
+
+    #Actions pour les différentes salles
     Scenario.room1(scenario, robot, motor)
     Scenario.room2(scenario, robot, motor)
     Scenario.room3(scenario, robot, motor)
@@ -75,20 +58,7 @@ def cozmo_program(robot : cozmo.robot.Robot):
     Scenario.room5(scenario, robot, motor)
     Scenario.room6(scenario, robot, motor)
     Scenario.endGame(scenario, robot, motor)
-    
-    '''agent = CrimeInference()
-    
-    # Conclusions
-    print("Pièce du crime : ", agent.get_crime_room())
-    print("Arme du crime : ", agent.get_crime_weapon())
-    print("Personne victime : ", agent.get_victim())
-    print("Heure du crime : ", agent.get_crime_hour())
-    print("Meurtrier : ", agent.get_suspect())
-    print("Personnes innocentes : ", agent.get_innocent())
-    '''
 
     print("FINISH")
-    while True:
-        time.sleep(0.1)
 
 cozmo.run_program(cozmo_program, use_3d_viewer=True, use_viewer=True)
