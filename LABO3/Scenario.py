@@ -43,46 +43,61 @@ Armes:
 14-Le LanceFlamme était à Celadopole à 14h
 
 BREF: 
-BourgPalette: Carapuce  
+FloraVille: Carapuce, BatteBaseballAvecClous
 Azuria: PistoletAEau, Ectoplasma  
-Jadielle: Tronçonneuse  
-Lavanville: Dracaufeu(cube victime), Pikachu(cube villain), grenade  
+Jadielle: Tronçonneuse, Pikachu(cube villain)
+Lavanville: Dracaufeu(cube victime), grenade  
 Celadopole: Evoli, LanceFlamme  
-CarminSurMer: Poison, Herbizarre, BatteBaseballAvecClous, PRISON  
+Rotombourg: Poison, Herbizarre, PRISON  
 '''
 import cozmo
 from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes, ObservableElement, ObservableObject, LightCube1Id, LightCube2Id, LightCube3Id
 from cozmo.util import Pose, degrees, distance_mm, speed_mmps, Vector3, Angle
 import time
+import nltk
+from nltk import load_parser
+from grammars import *
+import os
 
-ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, 175, 0, angle_z=Angle(0))]
-ROOM_2_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 175, 0, angle_z=Angle(0))]
+
+ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, 150, 0, angle_z=Angle(0))]
+ROOM_2_WAY = [Pose(-300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 150, 0, angle_z=Angle(0))]
 ROOM_3_WAY = [Pose(0, 0, 0, angle_z=Angle(0)), Pose(300, 0, 0, angle_z=Angle(0)), Pose(300, 200, 0, angle_z=Angle(0))]
-ROOM_4_WAY = [Pose(300,-175, 0, angle_z=Angle(0))]
-ROOM_5_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, -175, 0, angle_z=Angle(0))]
-ROOM_6_WAY = [Pose(0,0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300,-175, 0, angle_z=Angle(0))]
-GO_FETCH_VILLAIN_WAY = [Pose(-300,0, 0, angle_z=Angle(0)), Pose(300, 0, 0, angle_z=Angle(0)), Pose(300, -175, 0, angle_z=Angle(0))]
-BRING_HIM_TO_PRISON_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, -175, 0, angle_z=Angle(0))]
+ROOM_4_WAY = [Pose(300,-150, 0, angle_z=Angle(0))]
+ROOM_5_WAY = [Pose(300, 0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, -150, 0, angle_z=Angle(0))]
+ROOM_6_WAY = [Pose(0,0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300,-150, 0, angle_z=Angle(0))]
+GO_FETCH_VILLAIN_WAY = [Pose(-300,0, 0, angle_z=Angle(0)), Pose(0, 0, 0, angle_z=Angle(0)), Pose(0, 150, 0, angle_z=Angle(0))]
+BRING_HIM_TO_PRISON_WAY = [Pose(0, 0, 0, angle_z=Angle(0)), Pose(-300, 0, 0, angle_z=Angle(0)), Pose(-300, -150, 0, angle_z=Angle(0))]
 
+'''
+ROOM_1_WAY = [Pose(-300, 0, 0, angle_z=Angle(0))]
+ROOM_2_WAY = [Pose(0, 0, 0, angle_z=Angle(0))]
+ROOM_3_WAY = [Pose(300, 0, 0, angle_z=Angle(0))]
+ROOM_4_WAY = [Pose(300, 0, 0, angle_z=Angle(0))]
+ROOM_5_WAY = [Pose(0, 0, 0, angle_z=Angle(0))]
+ROOM_6_WAY = [Pose(-300, 0, 0, angle_z=Angle(0))]
+GO_FETCH_VILLAIN_WAY = [Pose(0, 0, 0, angle_z=Angle(0))]
+BRING_HIM_TO_PRISON_WAY = [Pose(-300, 0, 0, angle_z=Angle(0))]
+'''
 
 class Scenario:
 
-    cube_reponse=None
+    cube_response=None
 
     def init():
         print("A quelle heure est morte la victime?")
         
     @classmethod
-    def set_cube_response(cls, reponse):
-        cls.cube_reponse = reponse
+    def set_cube_response(cls, response):
+        cls.cube_response = response
 
     @classmethod
-    def attendre_reponse_cube(cls, timeout=10):
+    def attendre_reponse_cube(cls, timeout=5):
         start_time = time.time()
         print("En attente de la réponse...")
 
         # Boucle jusqu'à ce qu'une réponse soit reçue ou que le timeout soit atteint
-        while cls.cube_response is None and (time.time() - start_time) < timeout:
+        while (time.time() - start_time) < timeout:
             time.sleep(0.1)  # Attendre un petit moment pour ne pas bloquer totalement
 
         if cls.cube_response is not None:
@@ -99,131 +114,196 @@ class Scenario:
 
     def room1(self, robot: cozmo.robot.Robot, motor):
         print("Room1")
+        # self.arme_piece_clause(motor, "BatteBaseball", "Floraville") 
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_1_WAY)
         
         #Ask questions
-        room = self.FindRoom(robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(robot)
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+
+        room,weapon,pokemon = self.FindInfos(robot)
+        pokemon = 'Dracaufeu'
         print("Je vois " + pokemon)
+
+        print("Est il vivant")
+        self.attendre_reponse_cube()
         
         
         #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est vivant.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_morte_clause(motor, pokemon)
+
+        # motor.add_clause(pokemon + " est tranché.")
+        self.personne_marque_clause(motor, pokemon)
+
+        #Receive answers
+        print('A quelle heure est mort ' + pokemon)
+        hour = input()
+        # motor.add_clause(pokemon + 'était dans la '+ room + ' à ' + hour)
+        self.personne_morte_heure_clause(motor, pokemon, hour)
+
+        self.personne_piece_heure_clause(motor, pokemon, room, hour)
+
+        # self.flip_cube(robot)
         
         #Receive answers
     def room2(self, robot: cozmo.robot.Robot, motor):
         print("Room2")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_2_WAY)
         #Ask questions
-        room = self.FindRoom(self, robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(self, robot)
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+
+        room,weapon,pokemon = self.FindInfos(robot)
+        pokemon = 'Pikachu'
         print("Je vois " + pokemon)
         
-        
         #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est vivant.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_vivant_clause(motor, pokemon)
         #Receive answers
-        self.flip_cube(robot)
+        print('où était le pokemon une heure après le crime ')
+        room = input()
+        self.personne_piece_heure_clause(motor, pokemon, room, "9h")
+
     def room3(self, robot: cozmo.robot.Robot, motor):
         print("Room3")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_3_WAY)
         
         #Ask questions
-        room = self.FindRoom(self, robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(self, robot)
-        print("Je vois " + pokemon)
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+        #pokemon = self.FindPokemon(robot)
+        #print("Je vois " + pokemon)
+
+        room,weapon,pokemon = self.FindInfos(robot)
         
         
-        #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+       #Dire dans quelle piece se trouve l'arme
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est vivant.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_vivant_clause(motor, pokemon)
         #Receive answers
+        print('où était le pokemon une heure après le crime ')
+        room = input()
+        self.personne_piece_heure_clause(motor, pokemon, room, "9h")
         
     def room4(self, robot: cozmo.robot.Robot, motor):
         print("Room4")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_4_WAY)
+
         #Ask questions
-        room = self.FindRoom(self, robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = "Dracaufeu"
-        print("Je vois " + pokemon)
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+        #pokemon = self.FindPokemon(robot)
+        #print("Je vois " + pokemon)
+
+        room,weapon,pokemon = self.FindInfos(robot)
         
         #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est mort.")
-        #Dire que le pokemon est tranché
-        motor.add_clause(pokemon + " est tranché.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_vivant_clause(motor, pokemon)
         #Receive answers
+        print('où était le pokemon une heure après le crime ')
+        room = input()
+        self.personne_piece_heure_clause(motor, pokemon, room, "9h")
+        
     def room5(self, robot: cozmo.robot.Robot, motor):
         print("Room5")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_5_WAY)
         
         #Ask questions
-        room = self.FindRoom(self, robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(self, robot)
-        print("Je vois " + pokemon)
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+        #pokemon = self.FindPokemon(robot)
+        #print("Je vois " + pokemon)
         
+        room,weapon,pokemon = self.FindInfos(robot)
         
         #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est vivant.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_vivant_clause(motor, pokemon)
         #Receive answers
+        print('où était le pokemon une heure après le crime ')
+        room = input()
+        self.personne_piece_heure_clause(motor, pokemon, room, "9h")
+
     def room6(self, robot: cozmo.robot.Robot, motor):
         print("Room6")
         self.justMoveToListOfPoseImSayingLittleDevil(robot, ROOM_6_WAY)
         
         #Ask questions
-        room = self.FindRoom(robot)
-        print("Je suis présentement dans" + room)
-        weapon = self.FindWeapon(self, robot)
-        print("Je vois l'arme: " + weapon)
-        pokemon = self.FindPokemon(self, robot)
-        print("Je vois " + pokemon)
-        
+        #room = self.FindRoom(robot)
+        #print("Je suis présentement dans" + room)
+        #weapon = self.FindWeapon(robot)
+        #print("Je vois l'arme: " + weapon)
+        #pokemon = self.FindPokemon(robot)
+        #print("Je vois " + pokemon)
+
+        room,weapon,pokemon = self.FindInfos(robot)
         
         #Dire dans quelle piece se trouve l'arme
-        motor.add_clause(weapon + " est dans la " + room)        
+        # motor.add_clause(weapon + " est dans la " + room)      
+        self.arme_piece_clause(motor, weapon, room)  
         #Dire que le pokemon est dans la piece
-        motor.add_clause(pokemon + " est dans la " + room)
+        # motor.add_clause(pokemon + " est dans la " + room)
+        self.personne_piece_clause(motor, pokemon, room)
         #Dire que le pokemon est vivant
-        motor.add_clause(pokemon + " est vivant.")
+        # motor.add_clause(pokemon + " est mort.")
+        self.personne_vivant_clause(motor, pokemon)
         #Receive answers
+        print('où était le pokemon une heure après le crime ')
+        room = input()
+        self.personne_piece_heure_clause(motor, pokemon, room, "9h")
         
-    def endGame(self, robot: cozmo.robot.Robot):
+    def endGame(self, robot: cozmo.robot.Robot, motor):
+
+        print(motor.get_suspect())
+        
         #I KNOW WHO IT IS
         self.justMoveToListOfPoseImSayingLittleDevil(robot, GO_FETCH_VILLAIN_WAY)
-        self.tap_and_lift_cube(robot)
+        #self.tap_and_lift_cube(robot)
+        time.sleep(10)
+        robot.set_lift_height(1).wait_for_completed()
         #Hit the cube, take the cube, shit yourself because you can't grab the cube
         self.justMoveToListOfPoseImSayingLittleDevil(robot, BRING_HIM_TO_PRISON_WAY)
         robot.set_lift_height(0).wait_for_completed()
@@ -231,6 +311,7 @@ class Scenario:
 
     def justMoveToListOfPoseImSayingLittleDevil(self, robot:cozmo.robot.Robot, listOfPose):
         for position in listOfPose:
+            print("move")
             robot.go_to_pose(position).wait_for_completed()
 
     #TODO: MAKE IT WORK (Async problem)
@@ -275,16 +356,87 @@ class Scenario:
         # Étape 4 : Soulever le cube
         robot.set_lift_height(1.0).wait_for_completed()  # Lever complètement le lift
         print("Cube tapé et soulevé avec succès !")
+
+    def FindInfos(self, robot:cozmo.robot.Robot):
+        qui = None
+        ou = None
+        quoi = None
+
+        lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        object_found = robot.world.wait_until_observe_num_objects(num=3, timeout=60) #LOOK TIMEOUTS
+        lookaround.stop()
+        for obj in object_found:
+            try:
+                recognized_thing = obj.object_type
+                # print(obj)
+            except:
+                recognized_thing = None
+            if recognized_thing == CustomObjectTypes.CustomType00:
+                print("Je suis présentement dans" + "Floraville")
+                ou = "Floraville"
+            elif recognized_thing == CustomObjectTypes.CustomType03:
+                print("Je suis présentement dans" + "Azuria")
+                ou = "Azuria"
+            elif recognized_thing == CustomObjectTypes.CustomType06:
+                print("Je suis présentement dans" + "Jadielle")
+                ou = "Jadielle"
+            elif recognized_thing == CustomObjectTypes.CustomType08:
+                print("Je suis présentement dans" + "Lavanville")
+                ou = "Lavanville"
+            elif recognized_thing == CustomObjectTypes.CustomType10:
+                print("Je suis présentement dans" + "Celadopole")
+                ou = "Celadopole"
+            elif recognized_thing == CustomObjectTypes.CustomType13:
+                print("Je suis présentement dans" + "Rotombourg")
+                ou = "Rotombourg"
+            elif recognized_thing == CustomObjectTypes.CustomType02:
+                print("Je vois " + "Carapuce")
+                qui = "Carapuce"
+            elif recognized_thing == CustomObjectTypes.CustomType05:
+                print("Je vois " + "Ectoplasma")
+                qui = "Ectoplasma"
+            elif recognized_thing == CustomObjectTypes.CustomType12:
+                print("Je vois " + "Evoli")
+                qui = "Evoli"
+            elif recognized_thing == CustomObjectTypes.CustomType15:
+                print("Je vois " + "Herbizarre")
+                qui = "Herbizarre"
+            elif recognized_thing == CustomObjectTypes.CustomType01:
+                print("Je vois l'arme: " + "Poison")
+                quoi = "Poison"
+            elif recognized_thing == CustomObjectTypes.CustomType04:
+                print("Je vois l'arme: " + "PistoletEau")
+                quoi = "PistoletEau"
+            elif recognized_thing == CustomObjectTypes.CustomType07:
+                print("Je vois l'arme: " + "Tronconneuse")
+                quoi = "Tronconneuse"
+            elif recognized_thing == CustomObjectTypes.CustomType09:
+                print("Je vois l'arme: " + "Grenade")
+                quoi = "Grenade"
+            elif recognized_thing == CustomObjectTypes.CustomType11:
+                print("Je vois l'arme: " + "LanceFlamme")
+                quoi = "LanceFlamme"
+            elif recognized_thing == CustomObjectTypes.CustomType14:
+                print("Je vois l'arme: " + "BatteBaseball")
+                quoi = "BatteBaseball"
+            else:
+                pass
+        #robot.start_behavior(cozmo.behavior.Behavior.stop)
+        #robot.drive_straight(distance_mm(0), speed_mmps(0)).wait_for_completed()  # Stop movement
+        lookaround.stop()
+        lookaround.stop()
+        lookaround.stop()
+        return (ou,quoi,qui)
         
     def FindRoom(self, robot:cozmo.robot.Robot):
         notFound = True
         while notFound:
             lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            object_found = robot.world.wait_until_observe_num_objects(num=3, timeout=60) #LOOK TIMEOUTS
             for obj in object_found:
                 try:
                     recognized_thing = obj.object_type
-                    print(obj)
+                    # print(obj)
                 except:
                     recognized_thing = None
                 if recognized_thing == CustomObjectTypes.CustomType00:
@@ -310,11 +462,11 @@ class Scenario:
         notFound = True
         while notFound:
             lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            object_found = robot.world.wait_until_observe_num_objects(num=3, timeout=60) #LOOK TIMEOUTS
             for obj in object_found:
                 try:
                     recognized_thing = obj.object_type
-                    print(obj)
+                    # print(obj)
                 except:
                     recognized_thing = None
                 if recognized_thing == CustomObjectTypes.CustomType01:
@@ -340,11 +492,11 @@ class Scenario:
         notFound = True
         while notFound:
             lookaround = robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
-            object_found = robot.world.wait_until_observe_num_objects(num=1, timeout=60) #LOOK TIMEOUTS
+            object_found = robot.world.wait_until_observe_num_objects(num=3, timeout=60) #LOOK TIMEOUTS
             for obj in object_found:
                 try:
                     recognized_thing = obj.object_type
-                    print(obj)
+                    # print(obj)
                 except:
                     recognized_thing = None
                 if recognized_thing == CustomObjectTypes.CustomType02:
@@ -359,58 +511,148 @@ class Scenario:
                 elif recognized_thing == CustomObjectTypes.CustomType15:
                     notFound = False
                     return "Herbizarre"
+                elif recognized_thing == LightCube1Id:
+                    notFound = False
+                    return "Pikachu"
+                elif recognized_thing == LightCube3Id:
+                    notFound = False
+                    return "Dracaufeu"
 
     def mapInit(self, robot: cozmo.robot.Robot):
         robot.world.define_custom_wall(CustomObjectTypes.CustomType00,
                                    CustomObjectMarkers.Triangles2,
-                                   50, 58, 26, 26, True)
+                                   60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType01,
                                     CustomObjectMarkers.Circles2,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
                                     CustomObjectMarkers.Diamonds2,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         
         robot.world.define_custom_wall(CustomObjectTypes.CustomType03,
                                     CustomObjectMarkers.Hexagons2,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType04,
                                     CustomObjectMarkers.Triangles3,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType05,
                                     CustomObjectMarkers.Circles3,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         
         robot.world.define_custom_wall(CustomObjectTypes.CustomType06,
                                     CustomObjectMarkers.Diamonds3,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType07,
                                     CustomObjectMarkers.Hexagons3,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
     
         robot.world.define_custom_wall(CustomObjectTypes.CustomType08,
                                     CustomObjectMarkers.Triangles4,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType09,
                                     CustomObjectMarkers.Circles4,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         
         robot.world.define_custom_wall(CustomObjectTypes.CustomType10,
                                     CustomObjectMarkers.Diamonds4,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType11,
                                     CustomObjectMarkers.Hexagons4,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType12,
                                     CustomObjectMarkers.Triangles5,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         
         robot.world.define_custom_wall(CustomObjectTypes.CustomType13,
                                     CustomObjectMarkers.Circles5,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType14,
                                     CustomObjectMarkers.Diamonds5,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
         robot.world.define_custom_wall(CustomObjectTypes.CustomType15,
                                     CustomObjectMarkers.Hexagons5,
-                                    50, 58, 26, 26, True)
+                                    60, 60, 50, 50, True)
+    
+    def arme_piece_clause(self, motor, arme, piece):
+        grammar_path = ".\\LABO3\\grammars\\arme_piece.fcfg"  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"Le {arme} est dans la {piece}".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+    
+    def personne_marque_clause(self, motor, pokemon):
+        grammar_path = '.\\LABO3\\grammars\\personne_marque.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} est tranché".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+
+    def personne_morte_heure_clause(self, motor, pokemon, heure):
+        grammar_path = '.\\LABO3\\grammars\\personne_morte_heure.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} est mort à {heure}".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+    
+    def personne_morte_clause(self, motor, pokemon):
+        grammar_path = '.\\LABO3\\grammars\\personne_morte.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} est mort".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+    
+    def personne_piece_heure_clause(self, motor, pokemon, piece, heure):
+        grammar_path = '.\\LABO3\\grammars\\personne_piece_heure.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} était dans la {piece} à {heure}".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+
+    def personne_piece_clause(self, motor, pokemon, piece):
+        grammar_path = '.\\LABO3\\grammars\\personne_piece.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} est dans la {piece}".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))
+
+    def personne_vivant_clause(self, motor, pokemon):
+        grammar_path = '.\\LABO3\\grammars\\personne_vivant.fcfg'  
+        parser = load_parser(grammar_path, trace=0)
+
+        # Example sentence
+        sentence = f"{pokemon} est vivant".split()
+
+        for tree in parser.parse(sentence):
+            semantic_representation = tree.label()['SEM']
+            # Add the semantic representation to the knowledge base
+            motor.add_clause(str(semantic_representation))

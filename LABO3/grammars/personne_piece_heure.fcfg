@@ -18,11 +18,11 @@ Npiece[SEM=<Rotombourg>] -> 'Rotombourg'
 Npiece[SEM=<Celadopole>] -> 'Celadopole'
 
 Nprop[SEM=<Pikachu>] -> 'Pikachu'
-Nprop[SEM=<Évioli>] -> 'Évioli'
+Nprop[SEM=<Evoli>] -> 'Evoli'
 Nprop[SEM=<Dracaufeu>] -> 'Dracaufeu'
 Nprop[SEM=<Ectoplasma>] -> 'Ectoplasma'
 Nprop[SEM=<Carapuce>] -> 'Carapuce'
-Nprop[SEM=<Herbizzare>] -> 'Herbizzare'
+Nprop[SEM=<Herbizarre>] -> 'Herbizarre'
 
 Nh[SEM=<1>] -> '1h' | '1h00'
 Nh[SEM=<2>] -> '2h' | '2h00'
